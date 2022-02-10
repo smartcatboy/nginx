@@ -1,0 +1,26 @@
+user root;
+daemon off;
+worker_processes 1;
+
+error_log /dev/null;
+
+events {
+    worker_connections 2048;
+}
+
+stream {
+    upstream out {
+        server www.baidu.com:443 max_fails=1 fail_timeout=600s;
+        server www.163.com:443 max_fails=1 fail_timeout=600s backup;
+    }
+    server {
+        listen 0.0.0.0:443;
+        listen 0.0.0.0:443 udp;
+        listen [::]:443;
+        listen [::]:443 udp;
+        resolver 127.0.0.1 valid=600s;
+        proxy_connect_timeout 5s;
+        proxy_timeout 30s;
+        proxy_pass out;
+    }
+}
